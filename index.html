@@ -2022,18 +2022,18 @@ async function doAITarotReading() {
     `${labels[i]}：${c.emoji} ${c.name}${c.suit ? ' ('+c.suit+')' : ''}${c.reversed ? ' [逆位]' : ''} — ${c.meaning}`
   ).join('\n');
 
-  const prompt = `你是一位资深塔罗占卜师。请根据以下三张塔罗牌为求问者提供深度个性化解读。结合三张牌的象征含义，串联成一个完整的故事。
-${lastTarotQuestion ? `求问者的问题是：「${lastTarotQuestion}」\n请围绕此问题解读牌面。\n` : ''}
+  const prompt = `你是一位资深塔罗占卜师。请根据以下三张塔罗牌为求问者提供深度解读。${lastTarotQuestion ? `\n求问者的问题是：「${lastTarotQuestion}」\n⚠️ 第一段必须直接、正面地回答这个问题。不要绕弯子，先给答案再解读。` : ''}
 求问者的三张牌：
 ${cardsPrompt}
 
-请按以下结构回复：
-1. 🔮 整体解读：三张牌串联起来的命运故事（200字左右）
-2. 💕 情感指引：结合牌面给求问者的感情建议
-3. 💼 事业/学业建议
-4. 🧭 关键提醒：求问者此刻最需要注意的一件事
+请严格按以下结构回复：
+${lastTarotQuestion ? `1. 🎯 直接回答：针对「${lastTarotQuestion}」这个问题，用2-3句话直接给出明确答案（是/否/怎么做/什么结果），不要铺垫
+2. 🔮 牌面解读：三张牌如何串联印证上述答案` : `1. 🔮 牌面解读：三张牌串联起来的命运故事`}
+3. 💕 情感指引
+4. 💼 事业/学业建议
+5. 🧭 关键提醒
 
-语言：中文，有温度、有文学感。`;
+语言：中文，直接、有温度、不啰嗦。`;
 
   try {
     const res = await fetch(settings.baseUrl.replace(/\/+$/, '') + '/chat/completions', {
@@ -2102,15 +2102,16 @@ async function doAIIChingReading() {
 卦名：${d.hexInfo.name} ${d.hexInfo.hexName || ''}
 卦辞：${d.hexInfo.desc || ''}
 ${d.hasChanging ? '此卦有动爻，形势正在转变。' : '此为静卦，当前局势稳定。'}
-${d.question ? `求问者的问题：「${d.question}」` : ''}
+${d.question ? `求问者的问题：「${d.question}」\n⚠️ 第一段必须直接、正面地回答这个问题。不要绕弯子，先给答案再解卦。` : ''}
 
-请按以下结构回复：
-1. 🔮 卦象解读：结合卦辞彖象，解释此卦对求问者的意义
-2. 🌊 形势分析：当前局势的深层剖析
-3. 🧭 行动建议：求问者应如何趋吉避凶
-4. ⚡ 关键提醒：此时最重要的一件事
+请严格按以下结构回复：
+${d.question ? `1. 🎯 直接回答：针对「${d.question}」这个问题，用2-3句话直接给出明确答案（吉/凶/怎么做/什么结果），不许铺垫
+2. 🔮 卦象解读：结合卦辞彖象，解释此卦如何印证上述答案` : `1. 🔮 卦象解读：结合卦辞彖象，解释此卦对求问者的意义`}
+3. 🌊 形势分析：当前局势的深层剖析
+4. 🧭 行动建议：求问者应如何趋吉避凶
+5. ⚡ 关键提醒
 
-语言：中文，有古典韵味但不晦涩。`;
+语言：中文，有古典韵味但不晦涩，直接不啰嗦。`;
 
   try {
     const res = await fetch(settings.baseUrl.replace(/\/+$/, '') + '/chat/completions', {
