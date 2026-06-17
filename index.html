@@ -214,12 +214,16 @@ main {
   border: 2px solid var(--gold);
   font-size: 1rem;
   flex-direction: column;
-  padding: 10px;
+  padding: 6px;
   text-align: center;
   color: var(--gold-light);
+  overflow: hidden;
 }
+.card-back.reversed { transform: rotateY(180deg) rotate(180deg); }
 .card-back .card-name { font-size: 0.8rem; color: var(--text-dim); }
 .card-back .card-emoji { font-size: 2rem; }
+.card-img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+.rev-badge { position: absolute; top: 4px; right: 4px; background: var(--accent); color: #fff; font-size: 0.6rem; padding: 2px 6px; border-radius: 8px; z-index: 2; font-weight: bold; }
 
 /* Coin toss */
 .coins-row {
@@ -401,23 +405,20 @@ main {
 <main>
   <!-- Mode buttons -->
   <div class="mode-grid" id="modeGrid">
-    <button class="mode-btn active" data-mode="tarot">
+    <button class="mode-btn active" data-mode="daily">
+      <span class="icon">🌟</span>今日运势<span class="label">星座生肖</span>
+    </button>
+    <button class="mode-btn" data-mode="tarot">
       <span class="icon">🃏</span>塔罗牌<span class="label">三张牌阵</span>
     </button>
     <button class="mode-btn" data-mode="iching">
       <span class="icon">☯️</span>周易<span class="label">六爻占卜</span>
-    </button>
-    <button class="mode-btn" data-mode="daily">
-      <span class="icon">🌟</span>每日运势<span class="label">星座生肖</span>
     </button>
     <button class="mode-btn" data-mode="crystal">
       <span class="icon">🔮</span>水晶球<span class="label">答案之球</span>
     </button>
     <button class="mode-btn" data-mode="number">
       <span class="icon">🎲</span>幸运数字<span class="label">彩票参考</span>
-    </button>
-    <button class="mode-btn" data-mode="zodiac">
-      <span class="icon">♈</span>星座命盘<span class="label">星盘运势</span>
     </button>
     <button class="mode-btn" data-mode="yesno">
       <span class="icon">⚖️</span>是否占卜<span class="label">二选一</span>
@@ -1107,20 +1108,70 @@ const ichingHexagrams = {
 };
 
 const dailyFortunes = [
-  { title:'大吉之日', overall:'⭐ 今日运势极佳！贵人运与财运双旺，你散发的自信与善意将吸引关键人物相助。适合启动新项目、签约或做重大决定——宇宙此刻站在你这边。', love:'单身者在社交场合光芒四射，主动打个招呼可能会有惊喜回应。恋爱中的你感受到伴侣格外的温柔，适合一起规划未来。', work:'上级或客户对你的表现印象深刻，长期未被认可的努力今天终于被看见。主动提出你酝酿已久的想法——大概率会被支持。', lucky:'🎨 金色 | 🔢 8, 17, 33 | 🕐 上午10点-12点' },
-  { title:'稳步上升', overall:'🌈 运势如旭日初升，虽未到顶峰但势头正好。今天适合做那些需要「持续力」而非「爆发力」的事。意外的好消息可能在午后悄然而至。', love:'暧昧中的人今天可能会收到一个明确信号——对方的某个举动会告诉你答案。恋爱中的你适合为关系「投资」：一顿精心准备的晚餐比昂贵的礼物更有效。', work:'长久卡住的流程突然推进了。你需要的不是更多努力，而是跟进一下之前发出的邮件或提案——答案已经在等着你了。', lucky:'🎨 绿色 | 🔢 3, 21, 45 | 🕐 下午2点-4点' },
-  { title:'宜静不宜动', overall:'🌤️ 运势平稳如水，波澜不惊。今天不适合冒险或重大决策，但特别适合整理、复盘和深度思考。把积压的琐事清一清，你会感到莫名的轻松。', love:'感情上不宜制造戏剧性——你的伴侣（或心仪对象）今天需要的是空间而非追问。沉默的陪伴比千言万语更有重量。', work:'把重点从「创造」切换到「整理」：清理邮箱、整理文件、完善流程。这些看似不起眼的动作正在为下一波爆发清理跑道。', lucky:'🎨 白色 | 🔢 5, 14, 28 | 🕐 早晨6点-8点' },
-  { title:'先抑后扬', overall:'⚡ 早晨可能遇到小波折或不如意的消息——但别被上午的情绪定义一整天。傍晚之前运势将明显回升，坚持下去。', love:'早上的一句无心之言可能引发误解——不要在情绪中做回应。给对方和自己几小时的冷静期，晚餐时间自然消解。', work:'突发的小状况会打乱你的日程。灵活应对而非抗拒——被打断之后你反而可能发现更高效的工作方式。', lucky:'🎨 蓝色 | 🔢 11, 29, 42 | 🕐 下午4点-6点' },
-  { title:'桃花盛放', overall:'💫 桃花运爆棚！你的魅力磁场今天格外强大——走在街上都会有人多看几眼。但桃花多不代表都要采摘，选择那个让你从心底感到平静的人。', love:'单身者今天不适合宅家——出门，哪怕只是楼下的咖啡馆。转角遇到爱的概率远超平时。恋爱中的人会与伴侣重拾初相识的悸动。', work:'创造力与表达能力同步走高。适合做需要「感染力」的工作：汇报、演讲、创意脑暴。你今天的说服力会让反对者都点头。', lucky:'🎨 粉色 | 🔢 2, 19, 36 | 🕐 傍晚6点-8点' },
-  { title:'财运高照', overall:'💰 财运突出的一天。可能收到拖欠许久的款项、意外发现遗忘的理财收益，或得到一个有利可图的副业线索。投资方面仍应保持理性——运气好不代表可以盲目。', love:'金钱可能与感情发生微妙的链接——共同消费、礼物、或将财务问题摆上台面讨论。坦诚比避讳更能保护关系。', work:'商业谈判或合同签署的绝佳时机。如果今天有人跟你谈钱——大方接招。你的谈判地位比你意识到的更强。', lucky:'🎨 金色 | 🔢 6, 15, 48 | 🕐 上午8点-10点' },
-  { title:'学而时习之', overall:'📚 学习运达到峰值。头脑如明镜般清晰——今天读过一遍的东西会异常牢固。如果有考试、面试或需要快速吸收大量信息——今天是你的幸运日。', love:'知识或共同兴趣会成为感情的催化剂。单身者可能在书店、课程或讲座中遇到智力上势均力敌的人。恋爱中的你们适合一起学点什么新东西。', work:'适合处理需要深度集中和逻辑分析的任务。你今天的效率可能相当于平时的两倍——把最重要的工作留给今天。', lucky:'🎨 黄色 | 🔢 7, 23, 39 | 🕐 上午10点-12点' },
-  { title:'人际关系高峰', overall:'🤝 贵人运与人际运双双走高。一个偶然的社交接触可能演变为重要的人脉资源。今天适合参加聚会、社群活动，或哪怕只是在茶水间多聊几句。', love:'朋友可能成为爱情的桥梁——一个不经意的介绍或许比一百次相亲更有效。恋爱中的人适合一起参加朋友聚会，你们之间的默契会成为众人眼中的风景。', work:'跨部门协作或客户沟通顺畅得令人惊讶。你想推进的合作——今天开口。好关系是做成事的一半，今天这一半已经到手了。', lucky:'🎨 橙色 | 🔢 9, 18, 27 | 🕐 中午12点-2点' },
-  { title:'创意巅峰', overall:'🔥 你的内在火焰烧得正旺。今天是创作、创新和表达的绝佳时机。如果你一直在酝酿某个作品、文章或计划——今天落笔，会超越自己平日的水平。', love:'用创意而非老套路表达爱意。一张手写卡片、一个自制的礼物，或一次别出心裁的约会——对方会被你突如其来的心意打动。', work:'打破常规的一天。如果一直用同一种方法做同一件事，今天试试完全不同的路径。你可能会发现一个更优解，甚至重新定义你的工作方式。', lucky:'🎨 红色 | 🔢 1, 25, 50 | 🕐 凌晨4点-6点（灵感高峰）' },
-  { title:'倾听内心', overall:'🌙 月亮在你星盘的最深处——今天适合独处、冥想和深入的自我对话。你一直在忙碌中忽略的那个内心声音，今天格外清晰。', love:'你爱的人需要的不是你的建议，而是你的耳朵。今天把「我理解你的感受」换成沉默的倾听——效果翻倍。', work:'某个看似无解的工作难题，答案不在会议室里，而在你安静下来的那一刻。抽出半小时独处，不刷手机，只是思考。', lucky:'🎨 紫色 | 🔢 4, 22, 44 | 🕐 深夜10点-12点' },
-  { title:'果断出击', overall:'🎯 之前让你犹豫不决的事，今天会突然变得清晰。这不是运气——是你潜意识终于处理完了所有信息并给出了判断。相信这个判断。', love:'关系中的一个模糊地带需要被澄清。暧昧中的你准备好了面对结果——无论好坏，清晰本身已经是一种解脱。', work:'拖延已久的决策今天必须做。不是因为你有了更多的信息——而是因为你已有的信息已经足够。完美决策不存在，但及时决策比完美决策更值钱。', lucky:'🎨 深蓝 | 🔢 10, 26, 38 | 🕐 上午11点-1点' },
-  { title:'被看见的日子', overall:'💎 你的才华终于被对的人看见。那个一直在暗自努力的你——今天会收到一个信号：有人注意到了。这不一定是夸张的表彰，可能只是领导的一句话、同行的私信、或一个意外的推荐。', love:'你一直在关系中默默付出的那些小事——对方今天终于给了你回应。不是对方变了，是你积累的温柔终于漫过了对方的感知线。', work:'提交你的作品、发出你的方案、展示你的成果。今天你的输出有更高的「被采纳率」。不要让完美主义继续耽误你的展示机会。', lucky:'🎨 银色 | 🔢 12, 31, 47 | 🕐 下午3点-5点' },
-  { title:'打破常规', overall:'🦋 一个旧版本的你正在退场。今天你可能会做一些「不像自己」的事——这正是蜕变的标志。舒服的改变是不存在的，但必要的改变从不等你准备好。', love:'你可能会被一个「不是你的菜」类型的人吸引——这恰恰说明你的标准在进化。恋爱中的人适合打破日常惯例：换个约会地点、尝试新的相处模式。', work:'被分配到一个完全陌生的任务？别慌——这是你能力边界的扩张机会。强者不是做自己擅长的，是擅长做自己不会的。', lucky:'🎨 青色 | 🔢 13, 34, 49 | 🕐 早上8点-10点' },
-  { title:'家宅安康', overall:'🏠 家庭运回暖。与家人的关系变得柔和，一个持续已久的家庭矛盾可能在今天找到和解的切口。如果一直想给家里添置什么——今天适合行动。', love:'家人可能影响你的感情生活——一个亲戚的话戳中了你一直在回避的问题。先别急着反驳，他们说的可能有一半是对的。恋爱中的你们适合一起回家看看。', work:'居家办公效率超高的一天。如果允许的话，今天在家工作会比办公室更出活。也可能收到与家庭或地产相关的工作机会。', lucky:'🎨 米色 | 🔢 16, 24, 41 | 🕐 傍晚5点-7点' }
+  { title:'大吉之日',
+    overall:'⭐ 今日运势极佳！贵人运与财运双旺，你散发的自信与善意将吸引关键人物相助。适合启动新项目、签约或做重大决定——宇宙此刻站在你这边。',
+    health:'精力充沛，适合开始新的健身计划。注意别因过度兴奋而忽略休息——充沛的精力也需要适度的睡眠来补充。',
+    love:'单身者在社交场合光芒四射。恋爱中的你感受到伴侣格外的温柔，适合一起规划未来。',
+    work:'上级或客户对你的表现印象深刻，长期未被认可的努力今天终于被看见。主动提出你酝酿已久的想法。',
+    study:'吸收新知识的速度飞快，适合攻克难点或开始一门新课程。考试运极佳。',
+    money:'正财偏财双旺。意外奖金或副业收入可能进账。投资眼光精准，但仍需做好分散配置。',
+    luck:'⭐⭐⭐⭐⭐ 五颗星 | 贵人方位：东南 | 宜：签约、聚会、运动' },
+  { title:'稳步上升',
+    overall:'🌈 运势如旭日初升，虽未到顶峰但势头正好。今天适合做需要「持续力」的事。意外的好消息可能在午后悄然而至。',
+    health:'身体状况在逐步回升中，适合温和运动。肩颈可能是疲劳累积点，注意定时起身活动。',
+    love:'暧昧中的人今天可能会收到一个明确信号。恋爱中的你适合为关系「投资」：一顿精心准备的晚餐。',
+    work:'长久卡住的流程突然推进了。跟进一下之前发出的邮件或提案——答案已经在等着你了。',
+    study:'循序渐进的一天。不要跳步骤，基础打牢比快速推进更重要。反复练习是今天的制胜关键。',
+    money:'小额进账不断。关注之前被忽略的优惠或退款，可能会有意外之喜。消费保持理性。',
+    luck:'⭐⭐⭐⭐ 四颗星 | 贵人方位：东北 | 宜：学习、整理、沟通' },
+  { title:'宜静不宜动',
+    overall:'🌤️ 运势平稳如水。今天不适合冒险或重大决策，但特别适合整理、复盘和深度思考。把积压的琐事清一清，你会感到莫名的轻松。',
+    health:'身体无明显不适，但精神层面可能需要关注。适合冥想、瑜伽或只是安静地喝杯茶。',
+    love:'感情上不宜制造戏剧性——你的伴侣今天需要的是空间而非追问。沉默的陪伴比千言万语更有重量。',
+    work:'把重点从「创造」切换到「整理」：清理邮箱、整理文件。这些看似不起眼的动作正在为下一波爆发清理跑道。',
+    study:'复习和整理笔记效率极高。之前模糊的概念今天会变得清晰。适合做知识体系的梳理而非新学。',
+    money:'宜守不宜攻。检查账单和订阅，可能会有不必要的支出被忽略。适合做月度预算回顾。',
+    luck:'⭐⭐⭐ 三颗星 | 贵人方位：正北 | 宜：整理、反思、休息' },
+  { title:'先抑后扬',
+    overall:'⚡ 早晨可能遇到小波折——但别被上午的情绪定义一整天。傍晚之前运势将明显回升，坚持下去。',
+    health:'早上可能感到疲惫或头痛，午后会自行缓解。多喝水，少喝咖啡。傍晚适合轻度运动释放压力。',
+    love:'早上的一句无心之言可能引发误解——不要在情绪中做回应。给对方和自己几小时冷静期。',
+    work:'突发的小状况会打乱你的日程。灵活应对而非抗拒——被打断之后你反而可能发现更高效的方式。',
+    study:'上午效率较低，不要强迫自己。下午4点后进入学习黄金期，把重要内容安排在那时。',
+    money:'上午避免任何消费决策。下午的你会比上午的你理性得多。今天不适合签约大额支出。',
+    luck:'⭐⭐⭐→⭐⭐⭐⭐ 三到四颗星 | 贵人方位：正西 | 宜：耐心、等待、下午行动' },
+  { title:'桃花盛放',
+    overall:'💫 桃花运爆棚！你的魅力磁场今天格外强大。但桃花多不代表都要采摘，选择那个让你从心底感到平静的人。',
+    health:'气色红润，桃花运也反映了你的良好状态。适合美容、护肤或改变发型，外在的改变会带来内在的愉悦。',
+    love:'单身者今天不适合宅家。转角遇到爱的概率远超平时。恋爱中的人会与伴侣重拾初相识的悸动。',
+    work:'创造力与表达能力同步走高。适合做需要「感染力」的工作：汇报、演讲、创意脑暴。',
+    study:'和同学讨论比独自苦读更有效。小组学习和讨论中你能够迅速抓到关键点。',
+    money:'为「体验」花钱是值得的：一场电影、一顿好饭、一束花。不要为悦己的消费感到内疚。',
+    luck:'⭐⭐⭐⭐ 四颗星 | 贵人方位：正南 | 宜：社交、表白、创意' },
+  { title:'财运高照',
+    overall:'💰 财运突出的一天。可能收到拖欠许久的款项、意外发现遗忘的理财收益。投资方面仍应保持理性——运气好不代表可以盲目。',
+    health:'关注肠胃和消化系统。享受美食的同时注意节制。晚餐清淡为宜。',
+    love:'金钱可能与感情发生微妙的链接——共同消费、礼物、或将财务问题摆上台面。坦诚比避讳更能保护关系。',
+    work:'商业谈判或合同签署的绝佳时机。你的谈判地位比你意识到的更强——大胆开口谈条件。',
+    study:'适合学习与金融、经济相关的知识。数字和逻辑类的学科今天特别顺手。',
+    money:'★★★★★ 财运五星！正财偏财双双走高。但记住：今天适合「收」不适合「散」，不要借钱或做担保。',
+    luck:'⭐⭐⭐⭐⭐ 五颗星 | 财神方位：正东 | 宜：收账、谈判、理财规划' },
+  { title:'学而时习之',
+    overall:'📚 学习运达到峰值。头脑如明镜般清晰——今天读过一遍的东西会异常牢固。有考试、面试或需要快速吸收大量信息——今天是你的幸运日。',
+    health:'大脑高速运转消耗能量大，注意补充优质蛋白和水分。长时间学习中间休息5分钟效果更好。',
+    love:'知识或共同兴趣会成为感情的催化剂。单身者可能在书店、课程或讲座中遇到智力上势均力敌的人。',
+    work:'适合处理需要深度集中和逻辑分析的任务。你今天的效率可能相当于平时的两倍。',
+    study:'📚 学习运五星！考试、论文、面试的绝佳时机。理解力翻倍，难题迎刃而解。',
+    money:'投资自己的教育或技能是今天最划算的消费。买书、报课或参加培训。',
+    luck:'⭐⭐⭐⭐ 四颗星 | 贵人方位：西北 | 宜：学习、考试、面试' },
+  { title:'人际关系高峰',
+    overall:'🤝 贵人运与人际运双双走高。一个偶然的社交接触可能演变为重要的人脉资源。今天适合参加聚会、社群活动。',
+    health:'社交活动多可能带来饮食不规律。注意饮酒适量，提前吃些东西保护胃。',
+    love:'朋友可能成为爱情的桥梁。恋爱中的人适合一起参加朋友聚会，你们之间的默契会成为众人眼中的风景。',
+    work:'跨部门协作或客户沟通顺畅得令人惊讶。你想推进的合作——今天开口，好关系是做成事的一半。',
+    study:'向他人请教比自己死磕更有效。今天的你特别能从别人的经验中学到东西。',
+    money:'AA制是今天最好的消费方式。团队聚餐或社交开销适度即可，不需要抢着买单来证明自己。',
+    luck:'⭐⭐⭐⭐⭐ 五颗星 | 贵人方位：南方 | 宜：社交、合作、组队' }
 ];
 
 const yesNoAnswers = [
@@ -1167,56 +1218,190 @@ const crystalAnswers = [
 const luckyColorEmojis = ['🔴红','🟠橙','🟡黄','🟢绿','🔵蓝','🟣紫','🌸粉','⚪白','⚫黑','🟤棕','🪙金','🥈银'];
 
 // ============ STATE ============
-let currentMode = 'tarot';
+let currentMode = 'daily';
 let hexagramLines = [];
 let hexagramStep = 0;
 let lastDrawnCards = null;
 let lastTarotQuestion = '';
+let lastHexagramData = null;
 
 // ============ HELPERS ============
 function $(sel) { return document.querySelector(sel); }
 function shuffle(arr) { const a = [...arr]; for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]; } return a; }
 function rand(min,max) { return Math.floor(Math.random()*(max-min+1))+min; }
 function pick(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+function getTarotImage(card, idx) {
+  if (!card.suit) {
+    const majors = ['00_Fool','01_Magician','02_High_Priestess','03_Empress','04_Emperor','05_Hierophant','06_Lovers','07_Chariot','08_Strength','09_Hermit','10_Wheel_of_Fortune','11_Justice','12_Hanged_Man','13_Death','14_Temperance','15_Devil','16_Tower','17_Star','18_Moon','19_Sun','20_Judgement','21_World'];
+    return `https://commons.wikimedia.org/wiki/Special:FilePath/RWS_Tarot_${majors[idx]||'00_Fool'}.jpg?width=200`;
+  }
+  const suits = { wands:'Wands', cups:'Cups', swords:'Swords', pentacles:'Pents' };
+  const ranks = ['Ace','02','03','04','05','06','07','08','09','10','Page','Knight','Queen','King'];
+  const startIdx = tarotCards.findIndex(c=>c.suit===card.suit);
+  const rankIdx = tarotCards.indexOf(card) - startIdx;
+  return `https://commons.wikimedia.org/wiki/Special:FilePath/${suits[card.suit]}${ranks[rankIdx]||'Ace'}.jpg?width=200`;
+}
+
+// Preload tarot images for speed
+let tarotImagesPreloaded = false;
+function preloadTarotImages() {
+  if (tarotImagesPreloaded) return;
+  tarotImagesPreloaded = true;
+  // Preload first 22 Major Arcana + 14 Wands (known to work)
+  const toPreload = tarotCards.slice(0, 36); // majors + wands
+  toPreload.forEach((c, i) => {
+    const url = getTarotImage(c, i);
+    if (url) {
+      const img = new Image();
+      img.src = url;
+    }
+  });
+}
+const suitSymbols = { wands:'🪵', cups:'🏆', swords:'⚔️', pentacles:'🪙' };
+const suitColors = { wands:'#f59e42', cups:'#60a5fa', swords:'#fbbf24', pentacles:'#4ade80' };
 
 // ============ RENDER PANEL ============
 function renderPanel() {
   const panel = $('#panel');
   switch(currentMode) {
-    case 'tarot': renderTarot(panel); break;
-    case 'iching': renderIChing(panel); break;
     case 'daily': renderDaily(panel); break;
+    case 'tarot': preloadTarotImages(); renderTarot(panel); break;
+    case 'iching': renderIChing(panel); break;
     case 'crystal': renderCrystal(panel); break;
     case 'number': renderNumber(panel); break;
-    case 'zodiac': renderZodiac(panel); break;
     case 'yesno': renderYesNo(panel); break;
   }
 }
 
 // ============ TAROT ============
+let tarotPickMode = false;
+let pickedCards = [];
+const PICK_COUNT = 78; // all cards in pick mode
+
+function getReversedNote(card) {
+  const notes = {
+    wands: '权杖逆位：热情受挫、行动迟缓或方向错误——你可能在错误的方向上用力过猛，或内心的火焰暂时熄灭。',
+    cups: '圣杯逆位：情感阻塞、创造力枯竭或对爱的接受能力下降——你的杯子暂时空了，需要先为自己斟满。',
+    swords: '宝剑逆位：思维混乱、沟通破裂或理智被情绪淹没——此刻的分析判断力偏弱，宜缓不宜急。',
+    pentacles: '星币逆位：物质损失、安全感动摇或投资失误的警示——守住已有的比追求更多更重要。'
+  };
+  if (card.suit) return notes[card.suit] || '逆位：当前能量受阻，需反思是否用力方向有误。放慢脚步，重新审视。';
+  // Major Arcana reversed
+  return `大阿卡那逆位：${card.name}的能量被扭曲或延迟——${card.meaning.slice(0,30)}…但这股能量此刻向内转化，提示你需要从内在而非外在寻找答案。`;
+}
+
 function renderTarot(panel) {
+  if (tarotPickMode) {
+    renderTarotPickMode(panel);
+    return;
+  }
   panel.innerHTML = `
     <div style="text-align:center;width:100%;">
       <p style="color:var(--text-dim);margin-bottom:8px;">🃏 先写下你想问的事，然后洗牌</p>
       <textarea id="tarotQuestion" placeholder="例：我和他/她未来会怎样？这份工作适合我吗？..." style="width:100%;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.3);color:var(--text);font-family:inherit;font-size:0.9rem;resize:none;height:60px;box-sizing:border-box;" maxlength="200"></textarea>
       <p style="font-size:0.7rem;color:var(--text-dim);text-align:right;margin:2px 0 10px;"><span id="tarotCharCount">0</span>/200</p>
-      <button class="btn gold" id="tarotShuffle">✨ 洗牌抽牌</button>
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;">
+        <button class="btn gold" id="tarotShuffle">✨ 随机抽牌</button>
+        <button class="btn" id="tarotPickBtn" style="background:rgba(255,255,255,0.08);font-size:0.85rem;padding:10px 18px;">🖐️ 自己选牌</button>
+      </div>
       <div class="cards-row" id="tarotCards"></div>
       <div id="tarotResult" style="margin-top:4px;"></div>
-      <p class="hint" id="tarotHint">三张牌分别代表：过去 · 现在 · 未来</p>
+      <p class="hint" id="tarotHint">💡 点击"随机抽牌"可重新占卜 | 也可点 🤖 按钮调用AI个性化解读</p>
     </div>`;
   document.getElementById('tarotShuffle').addEventListener('click', doTarotReading);
+  document.getElementById('tarotPickBtn').addEventListener('click', () => { tarotPickMode = true; renderTarot(panel); });
   const qInput = document.getElementById('tarotQuestion');
   const charCount = document.getElementById('tarotCharCount');
   qInput.addEventListener('input', () => { charCount.textContent = qInput.value.length; });
-  // restore previous question
   if (lastTarotQuestion) { qInput.value = lastTarotQuestion; charCount.textContent = lastTarotQuestion.length; }
+}
+
+function renderTarotPickMode(panel) {
+  pickedCards = [];
+  const deck = shuffle(tarotCards).slice(0, PICK_COUNT);
+  panel.innerHTML = `
+    <div style="text-align:center;width:100%;">
+      <p style="color:var(--gold-light);margin-bottom:6px;">🖐️ 点击三张牌来翻开</p>
+      <p style="color:var(--text-dim);margin-bottom:10px;font-size:0.85rem;">凭直觉选择，不要想太多</p>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:12px;" id="tarotPickGrid">
+        ${deck.map((c,i) => {
+          const imgUrl = getTarotImage(c, tarotCards.indexOf(c));
+          return `<div class="pick-card" data-idx="${i}" style="width:42px;height:70px;border-radius:6px;cursor:pointer;background:linear-gradient(135deg,#2a1f3d,#3d2a5c);border:1.5px solid rgba(123,94,167,0.5);display:flex;align-items:center;justify-content:center;font-size:1rem;transition:all 0.3s;position:relative;overflow:hidden;" onmouseover="this.style.borderColor='var(--gold)';this.style.boxShadow='0 0 10px rgba(212,168,83,0.3)'" onmouseout="this.style.borderColor='rgba(123,94,167,0.5)';this.style.boxShadow='none'">
+            <span style="font-size:0.9rem;">🃏</span>
+          </div>`;
+        }).join('')}
+      </div>
+      <p style="color:var(--text-dim);font-size:0.8rem;" id="tarotPickCount">已选 0 / 3 张</p>
+      <button class="btn" id="tarotPickBack" style="background:rgba(255,255,255,0.06);font-size:0.82rem;margin-top:8px;">⬅ 返回抽牌模式</button>
+      <div id="tarotResult" style="margin-top:14px;"></div>
+    </div>`;
+
+  document.getElementById('tarotPickBack').addEventListener('click', () => { tarotPickMode = false; renderTarot(panel); });
+
+  document.querySelectorAll('.pick-card').forEach(el => {
+    el.addEventListener('click', function() {
+      const idx = parseInt(this.dataset.idx);
+      const card = deck[idx];
+      if (this.classList.contains('revealed')) return;
+      if (pickedCards.length >= 3 && !this.classList.contains('selected')) return;
+
+      if (this.classList.contains('selected')) {
+        // Deselect
+        this.classList.remove('selected');
+        this.style.borderColor = 'rgba(123,94,167,0.5)';
+        this.style.boxShadow = 'none';
+        pickedCards = pickedCards.filter(p => p.card !== card);
+      } else {
+        // Select
+        card.reversed = Math.random() < 0.35;
+        this.classList.add('selected');
+        this.style.borderColor = 'var(--gold-light)';
+        this.style.boxShadow = '0 0 16px rgba(212,168,83,0.5)';
+        pickedCards.push({ card, el: this });
+        // Reveal immediately on select
+        const imgUrl = getTarotImage(card, tarotCards.indexOf(card));
+        const revClass = card.reversed ? ' style="transform:rotate(180deg);"' : '';
+        this.innerHTML = `
+          <div style="position:absolute;top:1px;right:1px;${card.reversed?'':'display:none;'} background:var(--accent);color:#fff;font-size:0.4rem;padding:0px 2px;border-radius:3px;z-index:2;">逆</div>
+          ${imgUrl ? `<img src="${imgUrl}" alt="${card.name}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;${card.reversed?'transform:rotate(180deg);':''}" onerror="this.style.display='none';">` : ''}
+          <div style="position:absolute;bottom:1px;left:1px;right:1px;background:rgba(0,0,0,0.65);font-size:0.38rem;color:#fff;padding:0px 1px;border-radius:2px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${card.emoji}${card.reversed?'↕':''}</div>
+        `;
+        this.classList.add('revealed');
+      }
+      document.getElementById('tarotPickCount').textContent = `已选 ${pickedCards.length} / 3 张`;
+
+      // When 3 picked, show result
+      if (pickedCards.length >= 3) {
+        const labels = ['第一张', '第二张', '第三张'];
+        const drawn = pickedCards.map(p => p.card);
+        lastDrawnCards = drawn;
+        const question = $('#tarotQuestion')?.value?.trim() || '';
+        const revNote = (c) => c.reversed ? `<div style="background:rgba(196,69,105,0.1);border-left:3px solid var(--accent);border-radius:8px;padding:8px;margin:4px 0;font-size:0.78rem;line-height:1.5;">↕️ <b>逆位解读：</b>${getReversedNote(c)}</div>` : '';
+        $('#tarotResult').innerHTML = `
+          <div class="result" style="margin-top:14px;text-align:left;width:100%;">
+            <div class="title" style="text-align:center;">🔮 你选择的牌</div>
+            ${drawn.map((c,i) => `
+            <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:14px;margin:10px 0;border-left:3px solid ${c.suit==='wands'?'#f59e42':c.suit==='cups'?'#60a5fa':c.suit==='swords'?'#fbbf24':c.suit==='pentacles'?'#4ade80':'var(--gold)'};">
+              <div style="font-size:1.05rem;color:var(--gold-light);margin-bottom:4px;">${c.emoji} ${c.name}${c.reversed?' <span style="color:var(--accent);font-size:0.75rem;">[逆位]</span>':''}</div>
+              <div style="font-size:0.88rem;line-height:1.7;color:var(--text);">${c.meaning}</div>
+              ${revNote(c)}
+              <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:0.78rem;line-height:1.5;">
+                <div style="background:rgba(255,255,255,0.02);border-radius:6px;padding:6px;"><span style="color:var(--gold-light);">💕</span> ${c.love}</div>
+                <div style="background:rgba(255,255,255,0.02);border-radius:6px;padding:6px;"><span style="color:var(--gold-light);">💼</span> ${c.career}</div>
+              </div>
+            </div>`).join('')}
+          </div>`;
+      }
+    });
+  });
 }
 
 function doTarotReading() {
   const shuffled = shuffle(tarotCards);
   const drawn = shuffled.slice(0, 3);
   const labels = ['过去', '现在', '未来'];
+  // Random upright/reversed for each card
+  drawn.forEach(c => { c.reversed = Math.random() < 0.35; });
   lastDrawnCards = drawn;
   lastTarotQuestion = $('#tarotQuestion')?.value?.trim() || '';
   const question = lastTarotQuestion;
@@ -1231,17 +1416,26 @@ function doTarotReading() {
   resultDiv.innerHTML = '';
 
   // Show cards face down
-  cardsRow.innerHTML = drawn.map((c,i) => `
+  cardsRow.innerHTML = drawn.map((c,i) => {
+    const imgUrl = getTarotImage(c, tarotCards.indexOf(c));
+    const revClass = c.reversed ? ' reversed' : '';
+    return `
     <div class="card" id="card${i}">
       <div class="card-inner">
         <div class="card-front">🃏</div>
-        <div class="card-back">
-          <span class="card-emoji">${c.emoji}</span>
-          <span style="font-size:0.7rem;color:var(--gold-light);">${labels[i]}</span>
-          <span class="card-name">${c.name}</span>
+        <div class="card-back${revClass}">
+          ${c.reversed ? '<div class="rev-badge">逆位</div>' : ''}
+          ${imgUrl ? `<img src="${imgUrl}" alt="${c.name}" class="card-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">` : ''}
+          <div class="card-face-fallback" style="${imgUrl ? 'display:none' : 'display:flex'};flex-direction:column;align-items:center;gap:4px;">
+            <span style="font-size:${c.suit?'1.6rem':'2.2rem'};">${c.emoji}</span>
+            <span style="font-size:0.7rem;color:var(--gold-light);">${i+1}</span>
+            <span class="card-name">${c.name}</span>
+            ${c.suit ? `<span style="font-size:0.65rem;color:${suitColors[c.suit]||'var(--text-dim)'};">${suitSymbols[c.suit]||''}</span>` : ''}
+          </div>
         </div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 
   // Flip one by one
   setTimeout(() => {
@@ -1264,8 +1458,9 @@ function doTarotReading() {
         ${questionHTML}
         ${drawn.map((c,i) => `
         <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:14px;margin:10px 0;border-left:3px solid ${c.suit === 'wands' ? '#f59e42' : c.suit === 'cups' ? '#60a5fa' : c.suit === 'swords' ? '#fbbf24' : c.suit === 'pentacles' ? '#4ade80' : 'var(--gold)'};">
-          <div style="font-size:1.1rem;color:var(--gold-light);margin-bottom:6px;">${labels[i]} — ${c.emoji} ${c.name}${c.suit ? ' <span style="font-size:0.75rem;opacity:0.7;">[' + (suitNames[c.suit]||c.suit) + ']</span>' : ' <span style="font-size:0.75rem;opacity:0.5;">[大阿卡那]</span>'}</div>
+          <div style="font-size:1.1rem;color:var(--gold-light);margin-bottom:6px;">${c.emoji} ${c.name}${c.suit ? ' <span style="font-size:0.75rem;opacity:0.7;">[' + (suitNames[c.suit]||c.suit) + ']</span>' : ' <span style="font-size:0.75rem;opacity:0.5;">[大阿卡那]</span>'}${c.reversed ? ' <span style="color:var(--accent);font-size:0.8rem;">[逆位]</span>' : ''}</div>
           <div style="font-size:0.9rem;line-height:1.75;color:var(--text);">${c.meaning}</div>
+          ${c.reversed ? `<div style="background:rgba(196,69,105,0.1);border-left:3px solid var(--accent);border-radius:8px;padding:8px;margin:4px 0;font-size:0.78rem;line-height:1.5;">↕️ <b>逆位解读：</b>${getReversedNote(c)}</div>` : ''}
           <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.82rem;line-height:1.55;">
             <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:8px;"><span style="color:var(--gold-light);">💕 爱情</span><br>${c.love}</div>
             <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:8px;"><span style="color:var(--gold-light);">💼 事业</span><br>${c.career}</div>
@@ -1373,61 +1568,104 @@ function doIChingToss() {
 
 function showIChingResult() {
   const hexKey = hexagramLines.map(l => l.value).join('');
-  const hexInfo = ichingHexagrams[hexKey] || { name:'变卦', desc:'此卦象罕见，意味着你正处在特殊的转折点。保持开放心态，顺应变化。' };
+  const hexInfo = ichingHexagrams[hexKey] || { name:'变卦', hexName:'', desc:'此卦象罕见', judgment:'保持开放心态，顺应变化。', image:'特殊卦象暗示你需要跳出常规思维。', advice:'信守本心，宇宙自有安排。' };
   const hasChanging = hexagramLines.some(l => l.changing);
+  const question = $('#ichingQuestion')?.value?.trim() || '';
+  lastHexagramData = { hexKey, hexInfo, hasChanging, question, lines: hexagramLines };
   $('#ichingResult').innerHTML = `
-    <div class="result" style="margin-top:12px;text-align:left;width:100%;">
-      <div class="title" style="text-align:center;">${hexInfo.hexName || ''} ${hexInfo.name}</div>
-      <div style="font-size:0.85rem;color:var(--gold-light);text-align:center;margin:6px 0;">卦辞：${hexInfo.desc || ''}</div>
-      <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:12px;margin:8px 0;font-size:0.9rem;line-height:1.75;">📖 <b>彖曰：</b>${hexInfo.judgment || ''}</div>
-      <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:12px;margin:8px 0;font-size:0.9rem;line-height:1.75;">🌄 <b>象曰：</b>${hexInfo.image || ''}</div>
-      <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:12px;margin:8px 0;font-size:0.9rem;line-height:1.75;border-left:3px solid var(--purple-light);">🧭 <b>指引：</b>${hexInfo.advice || ''}</div>
-      ${hasChanging ? '<div style="color:var(--accent);text-align:center;margin-top:8px;font-size:0.85rem;">⚬ 有动爻 — 变化正在发生，形势可能转变</div>' : ''}
+    <div class="result" style="margin-top:16px;text-align:left;width:100%;">
+      ${question ? `<div style="background:rgba(212,168,83,0.08);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:0.88rem;color:var(--gold-light);text-align:center;border:1px dashed rgba(212,168,83,0.2);">💭 你问的是：<i>「${question.replace(/</g,'&lt;')}」</i></div>` : ''}
+      <div class="title" style="text-align:center;font-size:1.2rem;">${hexInfo.hexName || ''} ${hexInfo.name}</div>
+      <div style="font-size:0.9rem;color:var(--gold-light);text-align:center;margin:8px 0;font-style:italic;">卦辞：${hexInfo.desc || ''}</div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:14px;margin:10px 0;font-size:0.92rem;line-height:1.8;border-left:3px solid var(--gold);">📖 <b>彖曰</b>　${hexInfo.judgment || ''}</div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:14px;margin:10px 0;font-size:0.92rem;line-height:1.8;border-left:3px solid var(--purple-light);">🌄 <b>象曰</b>　${hexInfo.image || ''}</div>
+      <div style="background:rgba(123,94,167,0.08);border-radius:12px;padding:14px;margin:10px 0;font-size:0.92rem;line-height:1.8;border-left:3px solid var(--purple);">🧭 <b>指引</b>　${hexInfo.advice || ''}</div>
+      ${hasChanging ? `<div style="background:rgba(196,69,105,0.1);border-radius:10px;padding:10px;text-align:center;margin-top:10px;font-size:0.85rem;color:var(--accent);border:1px dashed rgba(196,69,105,0.3);">⚬ 卦中有动爻 —— 形势正在转变</div>` : `<div style="background:rgba(74,222,128,0.06);border-radius:10px;padding:8px;text-align:center;margin-top:10px;font-size:0.82rem;color:#4ade80;">🟢 静卦 —— 当前卦象稳定，宜顺势而为</div>`}
+      <div style="text-align:center;margin-top:14px;">
+        <button class="btn" id="ichingAiBtn" style="background:linear-gradient(135deg, #7b5ea7, #a78bfa);font-size:0.9rem;padding:10px 28px;">🤖 AI 深度解读</button>
+      </div>
     </div>`;
+  setTimeout(() => {
+    const aiBtn = $('#ichingAiBtn');
+    if (aiBtn) aiBtn.addEventListener('click', doAIIChingReading);
+  }, 100);
 }
 
 // ============ DAILY FORTUNE ============
 function renderDaily(panel) {
-  const zodiacs = ['🐭鼠','🐮牛','🐯虎','🐰兔','🐲龙','🐍蛇','🐴马','🐏羊','🐵猴','🐔鸡','🐶狗','🐷猪'];
   const today = new Date().toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+  const now = new Date();
+  const saved = JSON.parse(localStorage.getItem('divination_birth') || 'null');
+  const savedY = saved?.y || now.getFullYear()-25;
+  const savedM = saved?.m || 1;
+  const savedD = saved?.d || 1;
+
   panel.innerHTML = `
     <div style="text-align:center;width:100%;">
-      <p style="color:var(--text-dim);">📅 ${today}</p>
-      <p style="color:var(--text-dim);margin-bottom:10px;">选择你的生肖查看今日运势</p>
-      <div class="zodiac-select" id="zodiacSelect">
-        ${zodiacs.map((z,i) => `<button data-idx="${i}" title="${z}">${z.slice(0,2)}</button>`).join('')}
+      <p style="color:var(--gold-light);font-size:1.1rem;margin-bottom:4px;">📅 ${today}</p>
+      <p style="color:var(--text-dim);margin-bottom:12px;">输入生日，查看专属今日运势</p>
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:14px;flex-wrap:wrap;">
+        <input id="dailyYear" type="number" value="${savedY}" min="1900" max="${now.getFullYear()}" style="width:80px;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(0,0,0,0.3);color:var(--text);text-align:center;font-size:0.95rem;font-family:inherit;" placeholder="年">
+        <input id="dailyMonth" type="number" value="${savedM}" min="1" max="12" style="width:60px;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(0,0,0,0.3);color:var(--text);text-align:center;font-size:0.95rem;font-family:inherit;" placeholder="月">
+        <input id="dailyDay" type="number" value="${savedD}" min="1" max="31" style="width:60px;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(0,0,0,0.3);color:var(--text);text-align:center;font-size:0.95rem;font-family:inherit;" placeholder="日">
       </div>
+      <button class="btn gold" id="dailySubmit">✨ 查看今日运势</button>
       <div id="dailyResult" style="margin-top:14px;"></div>
     </div>`;
 
-  const btns = document.querySelectorAll('#zodiacSelect button');
-  btns.forEach(b => {
-    b.addEventListener('click', function() {
-      btns.forEach(x => x.classList.remove('selected'));
-      this.classList.add('selected');
-      const fortune = pick(dailyFortunes);
-      $('#dailyResult').innerHTML = `
-        <div class="result" style="text-align:left;width:100%;">
-          <div class="title" style="text-align:center;">🌟 ${zodiacs[parseInt(this.dataset.idx)]} 今日运势 · ${fortune.title}</div>
-          <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:12px;margin:8px 0;font-size:0.92rem;line-height:1.75;">📝 ${fortune.overall}</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.82rem;line-height:1.55;margin:8px 0;">
-            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:8px;"><span style="color:var(--gold-light);">💕 感情</span><br>${fortune.love}</div>
-            <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:8px;"><span style="color:var(--gold-light);">💼 工作</span><br>${fortune.work}</div>
+  document.getElementById('dailySubmit').addEventListener('click', () => {
+    const y = parseInt($('#dailyYear').value) || savedY;
+    const m = parseInt($('#dailyMonth').value) || savedM;
+    const d = parseInt($('#dailyDay').value) || savedD;
+    if (y < 1900 || y > now.getFullYear() || m < 1 || m > 12 || d < 1 || d > 31) {
+      $('#dailyResult').innerHTML = '<p style="color:var(--accent);">请输入有效的出生日期</p>';
+      return;
+    }
+    localStorage.setItem('divination_birth', JSON.stringify({ y, m, d }));
+    const western = getWesternZodiac(m, d);
+    const chineseZ = getChineseZodiac(y);
+    const chineseEl = getChineseElement(y);
+    // Deterministic fortune based on date + birth
+    const dateSeed = (y * 10000 + m * 100 + d) + (new Date().getFullYear() * 365 + new Date().getMonth() * 31 + new Date().getDate());
+    const fortune = dailyFortunes[dateSeed % dailyFortunes.length];
+    const age = now.getFullYear() - y;
+    $('#dailyResult').innerHTML = `
+      <div class="result" style="text-align:left;width:100%;">
+        <div class="title" style="text-align:center;">🌟 ${fortune.title}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0;">
+          <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:2rem;">${western.emoji}</div>
+            <div style="color:var(--gold-light);font-weight:bold;">${western.sign}</div>
+            <div style="font-size:0.75rem;color:var(--text-dim);">${western.element}象 · ${age}岁</div>
           </div>
-          <div class="detail" style="margin-top:6px;text-align:center;">${fortune.lucky}</div>
-        </div>`;
-    });
+          <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:12px;text-align:center;">
+            <div style="font-size:2rem;">${chineseZ.animal.slice(0,2)}</div>
+            <div style="color:var(--gold-light);font-weight:bold;">${chineseZ.animal} ${chineseEl}</div>
+            <div style="font-size:0.75rem;color:var(--text-dim);">贵人：${chineseZ.lucky.join(' ')}</div>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;margin:8px 0;font-size:0.92rem;line-height:1.75;">📝 ${fortune.overall}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.82rem;line-height:1.55;">
+          <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:8px;"><span style="color:var(--gold-light);">💕 感情</span><br>${fortune.love}</div>
+          <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:8px;"><span style="color:var(--gold-light);">💼 事业</span><br>${fortune.work}</div>
+          <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:8px;"><span style="color:var(--gold-light);">📚 学业</span><br>${fortune.study}</div>
+          <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:8px;"><span style="color:var(--gold-light);">❤️ 健康</span><br>${fortune.health}</div>
+          <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:8px;"><span style="color:var(--gold-light);">💰 财运</span><br>${fortune.money}</div>
+          <div style="background:rgba(255,255,255,0.02);border-radius:8px;padding:8px;"><span style="color:var(--gold-light);">🍀 运气</span><br>${fortune.luck}</div>
+        </div>
+      </div>`;
   });
+  if (saved) { setTimeout(() => document.getElementById('dailySubmit').click(), 200); }
 }
 
 // ============ CRYSTAL BALL ============
 function renderCrystal(panel) {
   panel.innerHTML = `
-    <div style="text-align:center">
+    <div style="text-align:center;width:100%;display:flex;flex-direction:column;align-items:center;">
       <p style="color:var(--text-dim);margin-bottom:6px;">🔮 凝视水晶球，心中默念你的问题...</p>
       <div class="crystal-ball" id="crystalBall">🔮</div>
       <button class="btn gold" id="crystalAsk" style="margin-top:12px;">✨ 寻求答案</button>
-      <div id="crystalResult" style="margin-top:10px;"></div>
+      <div id="crystalResult" style="margin-top:10px;width:100%;"></div>
     </div>`;
   document.getElementById('crystalAsk').addEventListener('click', doCrystalReading);
 }
@@ -1758,14 +1996,14 @@ async function doAITarotReading() {
   btn.textContent = '🤖 AI正在深度解读...';
   btn.style.opacity = '0.6';
 
-  const labels = ['过去', '现在', '未来'];
+  const labels = ['第一张', '第二张', '第三张'];
   const cardsPrompt = lastDrawnCards.map((c,i) =>
-    `${labels[i]}：${c.emoji} ${c.name}${c.suit ? ' ('+c.suit+')' : ''} — ${c.meaning}`
+    `${labels[i]}：${c.emoji} ${c.name}${c.suit ? ' ('+c.suit+')' : ''}${c.reversed ? ' [逆位]' : ''} — ${c.meaning}`
   ).join('\n');
 
   const prompt = `你是一位资深塔罗占卜师。请根据以下三张塔罗牌为求问者提供深度个性化解读。结合三张牌的象征含义，串联成一个完整的故事。
 ${lastTarotQuestion ? `求问者的问题是：「${lastTarotQuestion}」\n请围绕此问题解读牌面。\n` : ''}
-求问者的牌阵（时间之箭：过去→现在→未来）：
+求问者的三张牌：
 ${cardsPrompt}
 
 请按以下结构回复：
@@ -1823,6 +2061,62 @@ ${cardsPrompt}
     btn.style.opacity = '1';
   }
   btn.disabled = false;
+}
+
+// ============ AI I CHING READING ============
+async function doAIIChingReading() {
+  if (!lastHexagramData) return;
+  const btn = $('#ichingAiBtn');
+  const settings = getApiSettings();
+  if (!settings.key || !settings.baseUrl) {
+    alert('请先点击右上角 ⚙️ 配置 API Key');
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = '🤖 AI正在解读卦象...';
+  btn.style.opacity = '0.6';
+
+  const d = lastHexagramData;
+  const prompt = `你是资深周易大师。请为求问者深度解读以下卦象：
+卦名：${d.hexInfo.name} ${d.hexInfo.hexName || ''}
+卦辞：${d.hexInfo.desc || ''}
+${d.hasChanging ? '此卦有动爻，形势正在转变。' : '此为静卦，当前局势稳定。'}
+${d.question ? `求问者的问题：「${d.question}」` : ''}
+
+请按以下结构回复：
+1. 🔮 卦象解读：结合卦辞彖象，解释此卦对求问者的意义
+2. 🌊 形势分析：当前局势的深层剖析
+3. 🧭 行动建议：求问者应如何趋吉避凶
+4. ⚡ 关键提醒：此时最重要的一件事
+
+语言：中文，有古典韵味但不晦涩。`;
+
+  try {
+    const res = await fetch(settings.baseUrl.replace(/\/+$/, '') + '/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + settings.key },
+      body: JSON.stringify({
+        model: settings.model || 'deepseek-chat',
+        messages: [{ role: 'system', content: '你是精通周易六爻的占卜大师，解读深刻、引经据典。' }, { role: 'user', content: prompt }],
+        temperature: 0.8, max_tokens: 1200
+      })
+    });
+    if (!res.ok) { const err = await res.text(); throw new Error(`HTTP ${res.status}: ${err.slice(0,200)}`); }
+    const data = await res.json();
+    $('#ichingResult').insertAdjacentHTML('beforeend', `
+      <div class="result" style="margin-top:18px;text-align:left;width:100%;border-top:1px solid rgba(212,168,83,0.3);padding-top:16px;">
+        <div class="title" style="text-align:center;">🤖 AI 深度解读</div>
+        <div style="background:rgba(123,94,167,0.08);border-radius:12px;padding:16px;font-size:0.92rem;line-height:1.85;white-space:pre-line;">${data.choices[0].message.content}</div>
+        <p style="font-size:0.72rem;color:var(--text-dim);text-align:center;margin-top:8px;">⚡ 由 ${settings.model} 生成</p>
+      </div>`);
+    btn.textContent = '✅ 解读完成';
+    btn.style.background = 'linear-gradient(135deg, #4ade80, #22c55e)';
+  } catch (err) {
+    $('#ichingResult').insertAdjacentHTML('beforeend', `<div style="margin-top:12px;padding:12px;background:rgba(196,69,105,0.15);border-radius:10px;text-align:center;color:var(--accent);font-size:0.85rem;">❌ AI解读失败：${err.message}</div>`);
+    btn.textContent = '🔄 重试AI解读';
+  }
+  btn.disabled = false;
+  btn.style.opacity = '1';
 }
 
 // ============ INIT ============
