@@ -218,12 +218,14 @@ main {
   text-align: center;
   color: var(--gold-light);
   overflow: hidden;
+  position: relative;
 }
 .card-back.reversed { transform: rotateY(180deg) rotate(180deg); }
 .card-back .card-name { font-size: 0.8rem; color: var(--text-dim); }
 .card-back .card-emoji { font-size: 2rem; }
-.card-img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
-.rev-badge { position: absolute; top: 4px; right: 4px; background: var(--accent); color: #fff; font-size: 0.6rem; padding: 2px 6px; border-radius: 8px; z-index: 2; font-weight: bold; }
+.card-img { position: absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; border-radius:8px; z-index:1; }
+.rev-badge { position: absolute; top: 4px; right: 4px; background: var(--accent); color: #fff; font-size: 0.6rem; padding: 2px 6px; border-radius: 8px; z-index: 3; font-weight: bold; }
+.card-face-fallback { position: absolute; top:0; left:0; width:100%; height:100%; z-index:0; }
 
 /* Coin toss */
 .coins-row {
@@ -1362,9 +1364,12 @@ function renderTarotPickMode(panel) {
         const imgUrl = getTarotImage(card, tarotCards.indexOf(card));
         const revClass = card.reversed ? ' style="transform:rotate(180deg);"' : '';
         this.innerHTML = `
-          <div style="position:absolute;top:1px;right:1px;${card.reversed?'':'display:none;'} background:var(--accent);color:#fff;font-size:0.4rem;padding:0px 2px;border-radius:3px;z-index:2;">逆</div>
-          ${imgUrl ? `<img src="${imgUrl}" alt="${card.name}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;${card.reversed?'transform:rotate(180deg);':''}" onerror="this.style.display='none';">` : ''}
-          <div style="position:absolute;bottom:1px;left:1px;right:1px;background:rgba(0,0,0,0.65);font-size:0.38rem;color:#fff;padding:0px 1px;border-radius:2px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${card.emoji}${card.reversed?'↕':''}</div>
+          <div style="position:absolute;top:0;left:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;">
+            <span style="font-size:0.7rem;">${card.emoji}</span>
+            <span style="font-size:0.35rem;color:var(--text-dim);">${card.name.slice(0,4)}</span>
+          </div>
+          ${card.reversed ? '<div style="position:absolute;top:1px;right:1px;background:var(--accent);color:#fff;font-size:0.4rem;padding:0px 2px;border-radius:3px;z-index:2;">逆</div>' : ''}
+          ${imgUrl ? `<img src="${imgUrl}" alt="${card.name}" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;border-radius:4px;z-index:1;${card.reversed?'transform:rotate(180deg);':''}" loading="lazy" onerror="this.remove();">` : ''}
         `;
         this.classList.add('revealed');
       }
@@ -1390,7 +1395,15 @@ function renderTarotPickMode(panel) {
                 <div style="background:rgba(255,255,255,0.02);border-radius:6px;padding:6px;"><span style="color:var(--gold-light);">💼</span> ${c.career}</div>
               </div>
             </div>`).join('')}
+            <div style="text-align:center;margin-top:14px;">
+              <button class="btn" id="tarotAiBtn" style="background:linear-gradient(135deg, #7b5ea7, #a78bfa);font-size:0.9rem;padding:10px 28px;">🤖 AI 深度解读</button>
+            </div>
           </div>`;
+        // Bind AI button
+        setTimeout(() => {
+          const aiBtn = $('#tarotAiBtn');
+          if (aiBtn) aiBtn.addEventListener('click', doAITarotReading);
+        }, 100);
       }
     });
   });
@@ -1424,14 +1437,14 @@ function doTarotReading() {
       <div class="card-inner">
         <div class="card-front">🃏</div>
         <div class="card-back${revClass}">
-          ${c.reversed ? '<div class="rev-badge">逆位</div>' : ''}
-          ${imgUrl ? `<img src="${imgUrl}" alt="${c.name}" class="card-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">` : ''}
-          <div class="card-face-fallback" style="${imgUrl ? 'display:none' : 'display:flex'};flex-direction:column;align-items:center;gap:4px;">
+          <div class="card-face-fallback" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;">
             <span style="font-size:${c.suit?'1.6rem':'2.2rem'};">${c.emoji}</span>
-            <span style="font-size:0.7rem;color:var(--gold-light);">${i+1}</span>
+            <span style="font-size:0.65rem;color:var(--gold-light);">${i+1}</span>
             <span class="card-name">${c.name}</span>
-            ${c.suit ? `<span style="font-size:0.65rem;color:${suitColors[c.suit]||'var(--text-dim)'};">${suitSymbols[c.suit]||''}</span>` : ''}
+            ${c.suit ? `<span style="font-size:0.6rem;color:${suitColors[c.suit]||'var(--text-dim)'};">${suitSymbols[c.suit]||''}</span>` : ''}
           </div>
+          ${c.reversed ? '<div class="rev-badge">逆位</div>' : ''}
+          ${imgUrl ? `<img src="${imgUrl}" alt="${c.name}" class="card-img" loading="lazy" onerror="this.remove();">` : ''}
         </div>
       </div>
     </div>`;
