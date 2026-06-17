@@ -1328,7 +1328,8 @@ function renderTarotPickMode(panel) {
   panel.innerHTML = `
     <div style="text-align:center;width:100%;">
       <p style="color:var(--gold-light);margin-bottom:6px;">🖐️ 点击三张牌来翻开</p>
-      <p style="color:var(--text-dim);margin-bottom:10px;font-size:0.85rem;">凭直觉选择，不要想太多</p>
+      <p style="color:var(--text-dim);margin-bottom:8px;font-size:0.85rem;">凭直觉选择，不要想太多</p>
+      <input id="tarotPickQuestion" type="text" placeholder="默念你的问题…（选填）" value="${lastTarotQuestion||''}" style="width:100%;padding:10px 14px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);background:rgba(0,0,0,0.3);color:var(--text);font-size:0.85rem;text-align:center;font-family:inherit;margin-bottom:10px;outline:none;" maxlength="80">
       <div style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:12px;" id="tarotPickGrid">
         ${deck.map((c,i) => {
           const imgUrl = getTarotImage(c, tarotCards.indexOf(c));
@@ -1384,11 +1385,13 @@ function renderTarotPickMode(panel) {
         const labels = ['第一张', '第二张', '第三张'];
         const drawn = pickedCards.map(p => p.card);
         lastDrawnCards = drawn;
-        const question = $('#tarotQuestion')?.value?.trim() || '';
+        lastTarotQuestion = $('#tarotPickQuestion')?.value?.trim() || '';
+        const question = lastTarotQuestion;
         const revNote = (c) => c.reversed ? `<div style="background:rgba(196,69,105,0.1);border-left:3px solid var(--accent);border-radius:8px;padding:8px;margin:4px 0;font-size:0.78rem;line-height:1.5;">↕️ <b>逆位解读：</b>${getReversedNote(c)}</div>` : '';
         $('#tarotResult').innerHTML = `
           <div class="result" style="margin-top:14px;text-align:left;width:100%;">
             <div class="title" style="text-align:center;">🔮 你选择的牌</div>
+            ${question ? `<div style="background:rgba(212,168,83,0.08);border-radius:10px;padding:10px 14px;margin-bottom:10px;font-size:0.88rem;color:var(--gold-light);text-align:center;border:1px dashed rgba(212,168,83,0.2);">💭 你问的是：<i>「${question.replace(/</g,'&lt;')}」</i></div>` : ''}
             ${drawn.map((c,i) => `
             <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:14px;margin:10px 0;border-left:3px solid ${c.suit==='wands'?'#f59e42':c.suit==='cups'?'#60a5fa':c.suit==='swords'?'#fbbf24':c.suit==='pentacles'?'#4ade80':'var(--gold)'};">
               <div style="font-size:1.05rem;color:var(--gold-light);margin-bottom:4px;">${c.emoji} ${c.name}${c.reversed?' <span style="color:var(--accent);font-size:0.75rem;">[逆位]</span>':''}</div>
