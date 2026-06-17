@@ -1239,6 +1239,7 @@ function getTarotImage(card, idx) {
   }
   const suitNames = { wands:'Wands', cups:'Cups', swords:'Swords', pentacles:'Pentacles' };
   const rankWords = ['Ace','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Page','Knight','Queen','King'];
+  const startIdx = tarotCards.findIndex(c=>c.suit===card.suit);
   const rankIdx = tarotCards.indexOf(card) - startIdx;
   let rank = rankWords[rankIdx] || 'Ace';
   // Swords and Pentacles use "One" instead of "Ace" on Commons
