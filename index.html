@@ -1237,11 +1237,15 @@ function getTarotImage(card, idx) {
     const majors = ['00_Fool','01_Magician','02_High_Priestess','03_Empress','04_Emperor','05_Hierophant','06_Lovers','07_Chariot','08_Strength','09_Hermit','10_Wheel_of_Fortune','11_Justice','12_Hanged_Man','13_Death','14_Temperance','15_Devil','16_Tower','17_Star','18_Moon','19_Sun','20_Judgement','21_World'];
     return `https://commons.wikimedia.org/wiki/Special:FilePath/RWS_Tarot_${majors[idx]||'00_Fool'}.jpg?width=200`;
   }
-  const suits = { wands:'Wands', cups:'Cups', swords:'Swords', pentacles:'Pents' };
-  const ranks = ['Ace','02','03','04','05','06','07','08','09','10','Page','Knight','Queen','King'];
-  const startIdx = tarotCards.findIndex(c=>c.suit===card.suit);
+  const suitNames = { wands:'Wands', cups:'Cups', swords:'Swords', pentacles:'Pentacles' };
+  const rankWords = ['Ace','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Page','Knight','Queen','King'];
   const rankIdx = tarotCards.indexOf(card) - startIdx;
-  return `https://commons.wikimedia.org/wiki/Special:FilePath/${suits[card.suit]}${ranks[rankIdx]||'Ace'}.jpg?width=200`;
+  let rank = rankWords[rankIdx] || 'Ace';
+  // Swords and Pentacles use "One" instead of "Ace" on Commons
+  if (rankIdx === 0 && (card.suit === 'swords' || card.suit === 'pentacles')) rank = 'One';
+  const suit = suitNames[card.suit] || 'Wands';
+  const filename = `${rank} of ${suit} (Rider-Waite Smith tarot deck).png`;
+  return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(filename)}?width=200`;
 }
 
 // Preload tarot images for speed
