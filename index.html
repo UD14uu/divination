@@ -188,6 +188,7 @@ main {
   width: 90px; height: 140px;
   perspective: 800px;
   cursor: pointer;
+  position: relative;
 }
 .card-inner {
   width: 100%; height: 100%;
@@ -224,8 +225,7 @@ main {
 .card-back .card-name { font-size: 0.8rem; color: var(--text-dim); }
 .card-back .card-emoji { font-size: 2rem; }
 .card-img { position: absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; border-radius:8px; z-index:1; }
-.rev-badge { position: absolute; top: 4px; right: 4px; background: var(--accent); color: #fff; font-size: 0.6rem; padding: 2px 6px; border-radius: 8px; z-index: 3; font-weight: bold; }
-.card-back.reversed .rev-badge { transform: rotate(180deg); }
+.rev-badge { position: absolute; top: 4px; right: 4px; background: var(--accent); color: #fff; font-size: 0.6rem; padding: 2px 6px; border-radius: 8px; z-index: 10; font-weight: bold; }
 .card-face-fallback { position: absolute; top:0; left:0; width:100%; height:100%; z-index:0; }
 
 /* Coin toss */
@@ -1452,10 +1452,10 @@ function doTarotReading() {
             <span class="card-name">${c.name}</span>
             ${c.suit ? `<span style="font-size:0.6rem;color:${suitColors[c.suit]||'var(--text-dim)'};">${suitSymbols[c.suit]||''}</span>` : ''}
           </div>
-          ${c.reversed ? '<div class="rev-badge">逆位</div>' : ''}
           ${imgUrl ? `<img src="${imgUrl}" alt="${c.name}" class="card-img" loading="lazy" onerror="this.remove();">` : ''}
         </div>
       </div>
+      ${c.reversed ? '<div class="rev-badge">逆位</div>' : ''}
     </div>`;
   }).join('');
 
@@ -1517,16 +1517,18 @@ function renderIChing(panel) {
   hexagramLines = [];
   hexagramStep = 0;
   panel.innerHTML = `
-    <div style="text-align:center">
-      <p style="color:var(--text-dim);margin-bottom:8px;">☯️ 心中默念问题，掷铜钱六次得卦</p>
+    <div style="text-align:center;width:100%;">
+      <p style="color:var(--text-dim);margin-bottom:10px;">☯️ 心中默念问题，掷铜钱六次以成卦</p>
+      <input id="ichingQuestion" type="text" placeholder="例如：这次创业会成功吗？" value="${lastTarotQuestion||''}" style="width:100%;padding:12px 16px;border-radius:25px;border:1px solid rgba(212,168,83,0.3);background:rgba(0,0,0,0.3);color:var(--text);font-size:0.95rem;text-align:center;font-family:inherit;margin-bottom:16px;outline:none;" maxlength="80">
       <div class="coins-row" id="ichingCoins">
         <div class="coin">🪙</div>
         <div class="coin">🪙</div>
         <div class="coin">🪙</div>
       </div>
-      <p style="color:var(--gold-light);margin:6px 0;" id="ichingStep">第 1 / 6 次</p>
+      <p style="color:var(--gold-light);margin:10px 0;font-size:1rem;" id="ichingStep">第 1 / 6 爻</p>
+      <div style="display:flex;justify-content:center;gap:6px;margin-bottom:10px;" id="ichingDots">${[1,2,3,4,5,6].map(() => `<span style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.15);display:inline-block;transition:all 0.3s;"></span>`).join('')}</div>
       <button class="btn gold" id="ichingToss">🪙 掷铜钱</button>
-      <div class="hexagram" id="ichingHex"></div>
+      <div class="hexagram" id="ichingHex" style="margin:14px 0;min-height:50px;display:flex;flex-direction:column;align-items:center;"></div>
       <div id="ichingResult"></div>
     </div>`;
   document.getElementById('ichingToss').addEventListener('click', doIChingToss);
@@ -1534,12 +1536,13 @@ function renderIChing(panel) {
 
 function doIChingToss() {
   if (hexagramStep >= 6) {
-    // Reset
     hexagramLines = [];
     hexagramStep = 0;
     $('#ichingResult').innerHTML = '';
     $('#ichingHex').innerHTML = '';
     $('#ichingToss').textContent = '🪙 掷铜钱';
+    const dots = $('#ichingDots')?.querySelectorAll('span');
+    if (dots) dots.forEach(s => { s.style.background = 'rgba(255,255,255,0.15)'; s.style.boxShadow = 'none'; });
   }
 
   const coins = [$('#ichingCoins').children[0], $('#ichingCoins').children[1], $('#ichingCoins').children[2]];
