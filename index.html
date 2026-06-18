@@ -1600,7 +1600,7 @@ function showIChingResult() {
   $('#ichingResult').innerHTML = `
     <div class="result" style="margin-top:16px;text-align:left;width:100%;">
       ${question ? `<div style="background:rgba(212,168,83,0.08);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:0.88rem;color:var(--gold-light);text-align:center;border:1px dashed rgba(212,168,83,0.2);">💭 你问的是：<i>「${question.replace(/</g,'&lt;')}」</i></div>` : ''}
-      <div class="title" style="text-align:center;font-size:1.2rem;">${hexInfo.hexName || ''} ${hexInfo.name}</div>
+      <div class="title" style="text-align:center;font-size:1.2rem;">${hexInfo.name}</div>
       <div style="font-size:0.9rem;color:var(--gold-light);text-align:center;margin:8px 0;font-style:italic;">卦辞：${hexInfo.desc || ''}</div>
       <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:14px;margin:10px 0;font-size:0.92rem;line-height:1.8;border-left:3px solid var(--gold);">📖 <b>彖曰</b>　${hexInfo.judgment || ''}</div>
       <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:14px;margin:10px 0;font-size:0.92rem;line-height:1.8;border-left:3px solid var(--purple-light);">🌄 <b>象曰</b>　${hexInfo.image || ''}</div>
@@ -2103,7 +2103,7 @@ async function doAIIChingReading() {
 
   const d = lastHexagramData;
   const prompt = `你是资深周易大师。请为求问者深度解读以下卦象：
-卦名：${d.hexInfo.name} ${d.hexInfo.hexName || ''}
+卦名：${d.hexInfo.name}
 卦辞：${d.hexInfo.desc || ''}
 ${d.hasChanging ? '此卦有动爻，形势正在转变。' : '此为静卦，当前局势稳定。'}
 ${d.question ? `求问者的问题：「${d.question}」\n⚠️ 第一段必须直接、正面地回答这个问题。不要绕弯子，先给答案再解卦。` : ''}
