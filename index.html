@@ -1594,18 +1594,36 @@ function doIChingToss() {
 
 function showIChingResult() {
   const hexKey = hexagramLines.map(l => l.value).join('');
-  const hexInfo = ichingHexagrams[hexKey] || { name:'变卦', hexName:'', desc:'此卦象罕见', judgment:'保持开放心态，顺应变化。', image:'特殊卦象暗示你需要跳出常规思维。', advice:'信守本心，宇宙自有安排。' };
+  const hexInfo = ichingHexagrams[hexKey];
   const hasChanging = hexagramLines.some(l => l.changing);
   const question = $('#ichingQuestion')?.value?.trim() || '';
-  lastHexagramData = { hexKey, hexInfo, hasChanging, question, lines: hexagramLines };
+  // Dynamic fallback for unknown hexagrams
+  const yangCount = hexagramLines.filter(l => l.value === '1').length;
+  const yinCount = 6 - yangCount;
+  const info = hexInfo || {
+    name: (yangCount >= 4 ? '阳盛' : yangCount <= 2 ? '阴盛' : '阴阳相济') + '之卦',
+    desc: `此卦由${yangCount}阳爻${yinCount}阴爻组成` + (hasChanging ? '，且有动爻变化。' : '。'),
+    judgment: yangCount >= 5 ? '阳刚之气充盈，局势主动明朗。宜积极进取，果断行动。但需防刚愎自用——过于强势反而树敌。' :
+               yangCount >= 4 ? '阳爻占优，大势朝积极方向发展。你拥有主动权，但需以柔克刚，刚中带柔方能长久。' :
+               yangCount >= 3 ? '阴阳均衡，形势处于微妙的平衡点。此刻不宜冒进也不宜退缩——维持现状，静观其变是最好的策略。' :
+               yangCount >= 2 ? '阴爻居多，形势偏向被动。此时宜守不宜攻，保存实力，等待时机反转。以柔顺应对外界的压力。' :
+               '阴爻为主，局势由外界主导。你现在能做的最好选择就是顺势而为，不硬碰硬。隐忍不是懦弱，是为之后的反弹积蓄力量。',
+    image: yangCount > yinCount ? '阳长阴消，天光渐亮。内卦与外卦的互动暗示变化的方向是积极的——但速度取决于你如何配合这股力量。' :
+           yinCount > yangCount ? '阴长阳消，夜幕渐深。并非坏事——黑暗中有你看不到的酝酿。大地在夜晚吸收养分，你的收敛也是收获。' :
+           '阴阳持平，天地交泰。这是最接近「道」的状态——不偏不倚，不急不缓，万物各安其位。',
+    advice: hasChanging ? '卦中有动爻，意味着固定局面即将被打破。注意变爻所在位置——那是转机的具体落点。顺应变化比抗拒变化更省力。' :
+             yangCount >= 4 ? '你的力量正在峰值——用好它，但别透支。盛极必衰是天道，在顶峰时留一线退路。' :
+             '安静等待不是放弃。每一卦都有它的时节——此刻蛰伏，来日高飞。'
+  };
+  lastHexagramData = { hexKey, hexInfo: info, hasChanging, question, lines: hexagramLines };
   $('#ichingResult').innerHTML = `
     <div class="result" style="margin-top:16px;text-align:left;width:100%;">
       ${question ? `<div style="background:rgba(212,168,83,0.08);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:0.88rem;color:var(--gold-light);text-align:center;border:1px dashed rgba(212,168,83,0.2);">💭 你问的是：<i>「${question.replace(/</g,'&lt;')}」</i></div>` : ''}
-      <div class="title" style="text-align:center;font-size:1.2rem;">${(hexInfo.hexName||'').split(' ')[0]} ${hexInfo.name}</div>
-      <div style="font-size:0.9rem;color:var(--gold-light);text-align:center;margin:8px 0;font-style:italic;">卦辞：${hexInfo.desc || ''}</div>
-      <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:14px;margin:10px 0;font-size:0.92rem;line-height:1.8;border-left:3px solid var(--gold);">📖 <b>彖曰</b>　${hexInfo.judgment || ''}</div>
-      <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:14px;margin:10px 0;font-size:0.92rem;line-height:1.8;border-left:3px solid var(--purple-light);">🌄 <b>象曰</b>　${hexInfo.image || ''}</div>
-      <div style="background:rgba(123,94,167,0.08);border-radius:12px;padding:14px;margin:10px 0;font-size:0.92rem;line-height:1.8;border-left:3px solid var(--purple);">🧭 <b>指引</b>　${hexInfo.advice || ''}</div>
+      <div class="title" style="text-align:center;font-size:1.2rem;">${(info.hexName||'').split(' ')[0]} ${info.name}</div>
+      <div style="font-size:0.9rem;color:var(--gold-light);text-align:center;margin:8px 0;font-style:italic;">卦辞：${info.desc || ''}</div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:14px;margin:10px 0;font-size:0.92rem;line-height:1.8;border-left:3px solid var(--gold);">📖 <b>彖曰</b>　${info.judgment || ''}</div>
+      <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:14px;margin:10px 0;font-size:0.92rem;line-height:1.8;border-left:3px solid var(--purple-light);">🌄 <b>象曰</b>　${info.image || ''}</div>
+      <div style="background:rgba(123,94,167,0.08);border-radius:12px;padding:14px;margin:10px 0;font-size:0.92rem;line-height:1.8;border-left:3px solid var(--purple);">🧭 <b>指引</b>　${info.advice || ''}</div>
       ${hasChanging ? `<div style="background:rgba(196,69,105,0.1);border-radius:10px;padding:10px;text-align:center;margin-top:10px;font-size:0.85rem;color:var(--accent);border:1px dashed rgba(196,69,105,0.3);">⚬ 卦中有动爻 —— 形势正在转变</div>` : `<div style="background:rgba(74,222,128,0.06);border-radius:10px;padding:8px;text-align:center;margin-top:10px;font-size:0.82rem;color:#4ade80;">🟢 静卦 —— 当前卦象稳定，宜顺势而为</div>`}
       <div style="text-align:center;margin-top:14px;">
         <button class="btn" id="ichingAiBtn" style="background:linear-gradient(135deg, #7b5ea7, #a78bfa);font-size:0.9rem;padding:10px 28px;">🤖 AI 深度解读</button>
